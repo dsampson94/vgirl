@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
         mediaUrl,
         promptUsed,
         contentType,
-        maturity: maturity || 'SAFE',
         visibility: visibility || 'PUBLIC',
         isForSale: isForSale || false,
         priceCents,
+        maturity: maturity || 'SFW',
       },
       include: {
         vgirl: {

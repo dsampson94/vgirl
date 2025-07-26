@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json(conversations)

@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         vgirl: {
           select: {
@@ -22,10 +23,10 @@ export async function GET(
             },
           },
         },
-        sales: {
+        purchases: {
           select: {
             id: true,
-            buyerId: true,
+            userId: true,
             priceCents: true,
             createdAt: true,
           },
@@ -45,9 +46,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { 
       caption, 
       visibility, 
@@ -57,7 +59,7 @@ export async function PUT(
     } = await request.json()
     
     const post = await prisma.post.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         caption,
         visibility,
@@ -90,11 +92,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.post.delete({
-      where: { id: params.id },
+      where: { id },
     })
     
     return NextResponse.json({ message: 'Post deleted successfully' })

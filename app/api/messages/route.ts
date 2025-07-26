@@ -53,11 +53,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid sender type' }, { status: 400 })
     }
 
+    const role = sender === 'vgirl' ? 'assistant' : 'user'
+
     const message = await prisma.message.create({
       data: {
         conversationId,
         sender,
         content,
+        role,
       },
       include: {
         conversation: {

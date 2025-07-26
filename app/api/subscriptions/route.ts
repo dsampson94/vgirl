@@ -1,5 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from '    const { 
+      userId, 
+      vgirlId, 
+      tier,
+      priceCents, 
+      creatorCutCents, 
+      appCutCents, 
+      renewsAt 
+    } = await request.json()
+    
+    const subscription = await prisma.subscription.create({
+      data: {
+        userId,
+        vgirlId,
+        tier,
+        priceCents,
+        creatorCutCents,
+        appCutCents,
+        renewsAt: new Date(renewsAt),
+      },rt { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
