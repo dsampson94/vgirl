@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     const contentPack = await prisma.contentPack.findUnique({
       where: { id },
       include: {
@@ -46,10 +46,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     const { 
       title, 
       description, 
@@ -94,10 +94,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     await prisma.contentPack.delete({
       where: { id },
     })

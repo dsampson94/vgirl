@@ -37,11 +37,11 @@ export async function GET(request: NextRequest) {
         _count: {
           select: {
             posts: true,
-            subscribers: true,
+            subscriptions: true,
           },
         },
       },
-      orderBy: { popularity: 'desc' },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json(vgirls)
@@ -71,8 +71,7 @@ export async function POST(request: NextRequest) {
         avatarUrl,
         personality,
         tags: tags || [],
-        creationCostCents,
-        maturity: maturity || 'SAFE',
+        maturity: maturity || 'SFW',
       },
       include: {
         owner: {

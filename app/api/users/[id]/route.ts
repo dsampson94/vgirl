@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -16,19 +16,17 @@ export async function GET(
         role: true,
         credits: true,
         balanceCents: true,
-        isVerified: true,
         bio: true,
         country: true,
         createdAt: true,
         updatedAt: true,
-        vGirls: {
+        vgirls: {
           select: {
             id: true,
             name: true,
             bio: true,
             avatarUrl: true,
             maturity: true,
-            popularity: true,
             isFeatured: true,
             createdAt: true,
           },
@@ -48,10 +46,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     const { username, bio, country, credits, balanceCents } = await request.json()
     
     const user = await prisma.user.update({
@@ -70,7 +68,6 @@ export async function PUT(
         role: true,
         credits: true,
         balanceCents: true,
-        isVerified: true,
         bio: true,
         country: true,
         createdAt: true,
@@ -86,10 +83,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
   try {
-    const { id } = await params
+    const { id } = context.params
     await prisma.user.delete({
       where: { id },
     })

@@ -21,25 +21,6 @@ export async function GET(request: NextRequest) {
             username: true,
           },
         },
-        vgirl: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        post: {
-          select: {
-            id: true,
-            mediaUrl: true,
-            contentType: true,
-          },
-        },
-        contentPack: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
       },
       orderBy: { createdAt: 'desc' },
       take: parseInt(limit),
@@ -57,12 +38,7 @@ export async function POST(request: NextRequest) {
       userId, 
       type, 
       amountCents, 
-      creditsUsed,
-      appCutCents, 
-      creatorCutCents,
-      vgirlId,
-      postId,
-      contentPackId 
+      description
     } = await request.json()
     
     const transaction = await prisma.transaction.create({
@@ -70,24 +46,13 @@ export async function POST(request: NextRequest) {
         userId,
         type,
         amountCents,
-        creditsUsed,
-        appCutCents,
-        creatorCutCents,
-        vgirlId,
-        postId,
-        contentPackId,
+        description,
       },
       include: {
         user: {
           select: {
             id: true,
             username: true,
-          },
-        },
-        vgirl: {
-          select: {
-            id: true,
-            name: true,
           },
         },
       },

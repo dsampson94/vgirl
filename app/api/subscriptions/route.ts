@@ -1,23 +1,5 @@
-import { NextRequest, NextResponse } from '    const { 
-      userId, 
-      vgirlId, 
-      tier,
-      priceCents, 
-      creatorCutCents, 
-      appCutCents, 
-      renewsAt 
-    } = await request.json()
-    
-    const subscription = await prisma.subscription.create({
-      data: {
-        userId,
-        vgirlId,
-        tier,
-        priceCents,
-        creatorCutCents,
-        appCutCents,
-        renewsAt: new Date(renewsAt),
-      },rt { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +11,7 @@ export async function GET(request: NextRequest) {
     const where: any = {}
     if (userId) where.userId = userId
     if (vgirlId) where.vgirlId = vgirlId
-    if (active !== null) where.active = active === 'true'
+    if (active !== null) where.isActive = active === 'true'
 
     const subscriptions = await prisma.subscription.findMany({
       where,
@@ -48,7 +30,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json(subscriptions)
@@ -62,6 +44,7 @@ export async function POST(request: NextRequest) {
     const { 
       userId, 
       vgirlId, 
+      tier,
       priceCents, 
       creatorCutCents, 
       appCutCents,
@@ -72,6 +55,7 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         vgirlId,
+        tier,
         priceCents,
         creatorCutCents,
         appCutCents,
