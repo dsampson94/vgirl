@@ -14,18 +14,25 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  username      String         @unique
-  password      String
-  role          String         @default("USER")
-  bio           String?
-  country       String?
-  credits       Int            @default(0)
-  balanceCents  Int            @default(0)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  
+  id               String   @id @default(cuid())
+  email            String   @unique
+  username         String   @unique
+  password         String
+  role             String   @default("USER") // USER, CREATOR, PREMIUM, ADMIN
+  bio              String?
+  country          String?
+  credits          Int      @default(10) // Start with free credits
+  balanceCents     Int      @default(0)
+  subscriptionTier String   @default("FREE") // FREE, BASIC, PREMIUM, VIP
+  messagesLeft     Int      @default(10) // Daily message limit
+  lastMessageReset DateTime @default(now())
+  referralCode     String?  @unique
+  referredBy       String?
+  totalSpent       Int      @default(0) // Track lifetime spending
+  lastActive       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
   // Relations
   vgirls        VGirl[]
   conversations Conversation[]
@@ -35,18 +42,21 @@ model User {
 }
 
 model VGirl {
-  id           String        @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
   bio          String?
   avatarUrl    String?
   personality  String?
   tags         String[]
-  maturity     String        @default("SFW")
-  isFeatured   Boolean       @default(false)
+  maturity     String   @default("SFW")
+  isFeatured   Boolean  @default(false)
+  popularity   Int      @default(0)
+  messagePrice Int      @default(1) // Credits per message
+  isActive     Boolean  @default(true)
   ownerId      String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   // Relations
   owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   posts         Post[]
@@ -68,7 +78,7 @@ model Post {
   vgirlId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   // Relations
   vgirl     VGirl      @relation(fields: [vgirlId], references: [id], onDelete: Cascade)
   purchases Purchase[]
@@ -85,49 +95,49 @@ model ContentPack {
   vgirlId       String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   // Relations
   vgirl     VGirl      @relation(fields: [vgirlId], references: [id], onDelete: Cascade)
   purchases Purchase[]
 }
 
 model Conversation {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   vgirlId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   vgirl    VGirl     @relation(fields: [vgirlId], references: [id], onDelete: Cascade)
   messages Message[]
-  
+
   @@unique([userId, vgirlId])
 }
 
 model Message {
   id             String   @id @default(cuid())
   content        String
-  role           String   // "user" or "assistant"
-  sender         String   // "user" or "vgirl"
+  role           String // "user" or "assistant"
+  sender         String // "user" or "vgirl"
   conversationId String
   createdAt      DateTime @default(now())
-  
+
   // Relations
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model Purchase {
-  id            String       @id @default(cuid())
-  userId        String
-  priceCents    Int
-  createdAt     DateTime     @default(now())
-  
+  id         String   @id @default(cuid())
+  userId     String
+  priceCents Int
+  createdAt  DateTime @default(now())
+
   // Polymorphic relations (one of these will be set)
   postId        String?
   contentPackId String?
-  
+
   // Relations
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   post        Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -137,11 +147,11 @@ model Purchase {
 model Transaction {
   id          String   @id @default(cuid())
   userId      String
-  type        String   // "CREDIT_PURCHASE", "WITHDRAWAL", etc.
+  type        String // "CREDIT_PURCHASE", "WITHDRAWAL", etc.
   amountCents Int
   description String?
   createdAt   DateTime @default(now())
-  
+
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -150,7 +160,7 @@ model Subscription {
   id              String   @id @default(cuid())
   userId          String
   vgirlId         String
-  tier            String   // "BASIC", "PREMIUM", etc.
+  tier            String // "BASIC", "PREMIUM", etc.
   priceCents      Int
   creatorCutCents Int
   appCutCents     Int
@@ -158,10 +168,10 @@ model Subscription {
   renewsAt        DateTime
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   // Relations
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   vgirl VGirl? @relation(fields: [vgirlId], references: [id], onDelete: Cascade)
-  
+
   @@unique([userId, vgirlId])
 }

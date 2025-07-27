@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and api routes from crawling
+Disallow: /api/
+Disallow: /dashboard/admin/
+Disallow: /_next/
+Disallow: /generated/
+
+# Allow specific API routes that might be useful for SEO
+Allow: /api/vgirls
+Allow: /api/posts
+
+# Sitemap location
+Sitemap: https://vgirl.app/sitemap.xml

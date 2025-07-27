@@ -34,32 +34,45 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { 
-      userId, 
-      type, 
-      amountCents, 
-      description
-    } = await request.json()
-    
+    const body = await request.json()
+    const { userId, amount, credits, paypalOrderId, type } = body
+
+    // Validate required fields
+    if (!userId || !amount || !type) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Create transaction record
     const transaction = await prisma.transaction.create({
       data: {
         userId,
         type,
-        amountCents,
-        description,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
+        amountCents: Math.round(amount * 100), // Convert to cents
+        description: paypalOrderId ? `PayPal Order: ${paypalOrderId}` : `${type} transaction`
+      }
     })
-    
+
+    // If this is a credit purchase, update user credits
+    if (type === 'CREDIT_PURCHASE' && credits) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          credits: {
+            increment: credits
+          }
+        }
+      })
+    }
+
     return NextResponse.json(transaction, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 })
+    console.error('Error creating transaction:', error)
+    return NextResponse.json(
+      { error: 'Failed to create transaction' },
+      { status: 500 }
+    )
   }
 }
